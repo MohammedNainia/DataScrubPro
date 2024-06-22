@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DataScrub Pro</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="logo_updated.png" type="image/png" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>DataScrub Pro</h1>
+      <p style="text-align: center; font-size: 1.2rem; color: #fff">
+        Made by
+        <a
+          href="https://github.com/MohammedNainia"
+          style="color: #fff; text-decoration: underline"
+          >Mohammed Nainia</a
+        >
+      </p>
+    </header>
+    <main>
+      <div class="file-input">
+        <label for="fileInput" class="button">Upload File</label>
+        <input type="file" id="fileInput" hidden />
+        <button id="cleanData" class="button">Clean Data</button>
+        <button id="exportData" class="button">Export Data</button>
+        <button id="clearData" class="button">Clear</button>
+      </div>
+      <div class="options-log-container">
+        <div id="cleaningOptions">
+          <h2>Cleaning Options</h2>
+          <label
+            ><input type="checkbox" id="removeDuplicates" /> Remove
+            Duplicates</label
+          ><br />
+          <label
+            ><input type="checkbox" id="handleMissingValues" /> Handle Missing
+            Values</label
+          >
+          <select id="missingValuesMethod">
+            <option value="remove">Remove Rows</option>
+            <option value="fill">Fill with "N/A"</option></select
+          ><br />
+          <label
+            ><input type="checkbox" id="correctDateFormats" /> Correct Date
+            Formats</label
+          >
+          <input
+            type="text"
+            id="dateFormat"
+            placeholder="Date Format (e.g., YYYY-MM-DD)"
+          /><br />
+          <label
+            ><input type="checkbox" id="deleteOutliers" /> Delete
+            Outliers</label
+          ><br />
+          <label
+            ><input type="checkbox" id="convertDataTypes" /> Convert Data
+            Types</label
+          ><br />
+          <label
+            ><input type="checkbox" id="standardizeCapitalization" />
+            Standardize Capitalization</label
+          ><br />
+          <label
+            ><input type="checkbox" id="ensureStructuralConsistency" /> Ensure
+            Structural Consistency</label
+          >
+        </div>
+        <div class="log-container">
+          <h2>Data Cleaning Log</h2>
+          <div id="log"></div>
+        </div>
+      </div>
+      <div class="data-container">
+        <section class="original-data-section">
+          <h2>Original Data</h2>
+          <div id="originalDataTable" class="table-container"></div>
+        </section>
+        <section class="updated-data-section">
+          <h2>Updated Data</h2>
+          <div id="updatedDataTable" class="table-container"></div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

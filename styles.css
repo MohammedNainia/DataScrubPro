@@ -1,0 +1,140 @@
+@import url("https://fonts.googleapis.com/css2?family=Calibri:wght@400;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Calibri", sans-serif;
+}
+
+body {
+  background-color: #f3f3f3;
+  color: #333;
+  line-height: 1.6;
+}
+
+header {
+  background-color: #217346;
+  color: #fff;
+  padding: 1rem 0;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: normal;
+}
+
+main {
+  padding: 2rem;
+  width: 100%; /* Reduced from 1200px */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.file-input {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 2rem;
+}
+
+.button {
+  background-color: #217346;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #145a32;
+}
+
+.data-container {
+  display: flex;
+  gap: 2rem;
+}
+
+.original-data-section,
+.updated-data-section {
+  flex: 1; /* Equal flex value to make them the same size */
+  max-width: 50%; /* Ensure they are the same size */
+  min-width: 0; /* Allow shrinking */
+}
+
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+th,
+td {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  text-align: left;
+  min-width: 50px; /* Example minimum width for cells */
+}
+
+th {
+  background-color: #217346;
+  color: #fff;
+}
+
+.log-container {
+  flex: 1; /* Adjusted from 2 to 1 to make it shorter */
+  max-width: 800px; /* Set a max width to control the size */
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.log-container h2 {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.log-container h3 {
+  font-weight: bold;
+  color: #217346;
+}
+
+.log-container p {
+  margin: 0.5rem 0;
+}
+.options-log-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+#cleaningOptions {
+  flex: 1;
+}
+#log {
+  margin-top: 0.5rem;
+}
