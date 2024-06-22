@@ -80,6 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Function to clean data
+  // Function to clean data
+  // Function to clean data
   const cleanData = () => {
     let changesLog = [];
     cleanedData = _.cloneDeep(originalData);
@@ -137,8 +139,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (deleteOutliersCheckbox.checked) {
-      // Implement outlier detection and removal logic
-      // changesLog.push(`Deleted outliers: ${outliersRemovedCount}`);
+      const numericalColumns = Object.keys(cleanedData[0]).filter((key) =>
+        cleanedData.every((row) => !isNaN(row[key]))
+      );
+      let outliersRemovedCount = 0;
+
+      numericalColumns.forEach((column) => {
+        const values = cleanedData.map((row) => parseFloat(row[column]));
+        const q1 = quantile(values, 0.25);
+        const q3 = quantile(values, 0.75);
+        const iqr = q3 - q1;
+        const lowerBound = q1 - 1.5 * iqr;
+        const upperBound = q3 + 1.5 * iqr;
+
+        const initialLength = cleanedData.length;
+        cleanedData = cleanedData.filter(
+          (row) =>
+            parseFloat(row[column]) >= lowerBound &&
+            parseFloat(row[column]) <= upperBound
+        );
+        outliersRemovedCount += initialLength - cleanedData.length;
+      });
+
+      changesLog.push(`Deleted outliers: ${outliersRemovedCount}`);
     }
 
     if (convertDataTypesCheckbox.checked) {
@@ -170,12 +193,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (ensureStructuralConsistencyCheckbox.checked) {
-      // Implement structural consistency logic
-      // changesLog.push(`Ensured structural consistency: ${consistencyChangesCount}`);
+      let consistencyChangesCount = 0;
+      const headers = Object.keys(originalData[0]);
+      cleanedData = cleanedData.map((row) => {
+        const newRow = {};
+        headers.forEach((header) => {
+          newRow[header] = row[header] || "";
+        });
+        if (Object.keys(newRow).length !== Object.keys(row).length) {
+          consistencyChangesCount++;
+        }
+        return newRow;
+      });
+      changesLog.push(
+        `Ensured structural consistency: ${consistencyChangesCount}`
+      );
     }
 
     displayCleanedData(cleanedData);
     logCleanedDataActions(changesLog);
+  };
+
+  // Function to calculate quantile
+  const quantile = (arr, q) => {
+    const sorted = arr.sort((a, b) => a - b);
+    const pos = (sorted.length - 1) * q;
+    const base = Math.floor(pos);
+    const rest = pos - base;
+    if (sorted[base + 1] !== undefined) {
+      return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+    } else {
+      return sorted[base];
+    }
   };
 
   // Function to display cleaned data
