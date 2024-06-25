@@ -14,11 +14,13 @@ body {
 }
 
 header {
-  background-color: #217346;
-  color: #fff;
   padding: 1rem 0;
   text-align: center;
+  background-color: #217346;
+  color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  position: relative;
 }
 
 h1 {
@@ -27,8 +29,8 @@ h1 {
 }
 
 main {
-  padding: 2rem;
-  width: 100%; /* Reduced from 1200px */
+  padding-top: 2.9rem; /* Adjust padding to make space for header */
+  width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -41,7 +43,7 @@ main {
 .file-input {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 2rem;
+  margin-top: 1rem;
 }
 
 .button {
@@ -63,13 +65,13 @@ main {
 .data-container {
   display: flex;
   gap: 2rem;
+  padding: 0 2rem; /* Adjust padding for better layout */
 }
 
 .original-data-section,
 .updated-data-section {
-  flex: 1; /* Equal flex value to make them the same size */
-  max-width: 50%; /* Ensure they are the same size */
-  min-width: 0; /* Allow shrinking */
+  flex: 1;
+  min-width: 0;
 }
 
 .table-container {
@@ -92,7 +94,7 @@ td {
   padding: 0.5rem;
   border: 1px solid #ddd;
   text-align: left;
-  min-width: 50px; /* Example minimum width for cells */
+  min-width: 50px;
 }
 
 th {
@@ -101,9 +103,6 @@ th {
 }
 
 .log-container {
-  flex: 1; /* Adjusted from 2 to 1 to make it shorter */
-  max-width: 800px; /* Set a max width to control the size */
-  margin-top: 1rem;
   padding: 1rem;
   background-color: #f9f9f9;
   border: 1px solid #ddd;
@@ -126,15 +125,55 @@ th {
 .log-container p {
   margin: 0.5rem 0;
 }
+
 .options-log-container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 2rem;
   margin-bottom: 2rem;
 }
+
 #cleaningOptions {
-  flex: 1;
+  width: 100%;
+  position: sticky; /* Change to sticky */
+  top: 3rem; /* Adjust based on your header height */
+  background-color: #fff;
+  padding: 1rem;
+  z-index: 1000;
 }
-#log {
-  margin-top: 0.5rem;
+
+#cleaningOptions h2 {
+  margin-bottom: 1rem;
+}
+
+.options-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 1rem;
+}
+
+#cleaningOptions label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+#cleaningOptions input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+#missingValuesMethod,
+#customValueInput,
+#dateFormat {
+  display: block;
+  margin-top: 10px;
+}
+
+footer {
+  width: 100%;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  padding: 1rem;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }

@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const missingValuesMethodSelect = document.getElementById(
     "missingValuesMethod"
   );
+  const customValueInput = document.getElementById("customValueInput");
   const correctDateFormatsCheckbox =
     document.getElementById("correctDateFormats");
   const dateFormatInput = document.getElementById("dateFormat");
@@ -21,9 +22,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const ensureStructuralConsistencyCheckbox = document.getElementById(
     "ensureStructuralConsistency"
   );
+  const mergeDuplicateRowsCheckbox =
+    document.getElementById("mergeDuplicateRows");
 
   let originalData = [];
   let cleanedData = [];
+
+  // Show/hide custom value input based on selected method
+  missingValuesMethodSelect.addEventListener("change", () => {
+    if (missingValuesMethodSelect.value === "fill-custom") {
+      customValueInput.style.display = "inline";
+    } else {
+      customValueInput.style.display = "none";
+    }
+  });
 
   // Function to read the file
   const readFile = (file) => {
@@ -80,8 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Function to clean data
-  // Function to clean data
-  // Function to clean data
   const cleanData = () => {
     let changesLog = [];
     cleanedData = _.cloneDeep(originalData);
@@ -95,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (handleMissingValuesCheckbox.checked) {
       let handledCount = 0;
-      if (missingValuesMethodSelect.value === "remove") {
+      if (missingValuesMethodSelect.value === "remove-rows") {
         const initialLength = cleanedData.length;
         cleanedData = cleanedData.filter((row) => {
           const hasMissing =
@@ -107,17 +117,159 @@ document.addEventListener("DOMContentLoaded", () => {
         changesLog.push(
           `Handled missing values (removed rows): ${handledCount}`
         );
-      } else if (missingValuesMethodSelect.value === "fill") {
+      } else if (missingValuesMethodSelect.value === "remove-columns") {
+        const columnsToRemove = [];
+        const rowCount = cleanedData.length;
+
+        // Identify columns to remove
+        Object.keys(cleanedData[0]).forEach((key) => {
+          let emptyCount = 0;
+          cleanedData.forEach((row) => {
+            if (row[key] === null || row[key] === "") {
+              emptyCount++;
+            }
+          });
+          if (emptyCount === rowCount) {
+            columnsToRemove.push(key);
+          }
+        });
+
+        // Remove identified columns
+        cleanedData = cleanedData.map((row) => {
+          columnsToRemove.forEach((col) => delete row[col]);
+          return row;
+        });
+
+        changesLog.push(
+          `Handled missing values (removed columns): ${columnsToRemove.length}`
+        );
+      } else if (missingValuesMethodSelect.value === "fill-mean") {
+        const columnMeans = {};
+
+        // Calculate means
+        Object.keys(cleanedData[0]).forEach((key) => {
+          const values = cleanedData
+            .map((row) => parseFloat(row[key]))
+            .filter((value) => !isNaN(value));
+          const mean =
+            values.reduce((acc, value) => acc + value, 0) / values.length;
+          columnMeans[key] = mean;
+        });
+
+        // Fill missing values with column mean
         cleanedData = cleanedData.map((row) => {
           Object.keys(row).forEach((key) => {
             if (row[key] === null || row[key] === "") {
-              row[key] = "N/A";
+              row[key] = columnMeans[key];
               handledCount++;
             }
           });
           return row;
         });
-        changesLog.push(`Handled missing values (filled): ${handledCount}`);
+        changesLog.push(
+          `Handled missing values (filled with mean): ${handledCount}`
+        );
+      } else if (missingValuesMethodSelect.value === "fill-mode") {
+        const columnModes = {};
+
+        // Calculate modes
+        Object.keys(cleanedData[0]).forEach((key) => {
+          const values = cleanedData
+            .map((row) => row[key])
+            .filter((value) => value !== null && value !== "");
+          const mode = values.reduce((a, b, i, arr) =>
+            arr.filter((v) => v === a).length >=
+            arr.filter((v) => v === b).length
+              ? a
+              : b
+          );
+          columnModes[key] = mode;
+        });
+
+        // Fill missing values with column mode
+        cleanedData = cleanedData.map((row) => {
+          Object.keys(row).forEach((key) => {
+            if (row[key] === null || row[key] === "") {
+              row[key] = columnModes[key];
+              handledCount++;
+            }
+          });
+          return row;
+        });
+        changesLog.push(
+          `Handled missing values (filled with mode): ${handledCount}`
+        );
+      } else if (missingValuesMethodSelect.value === "fill-median") {
+        const columnMedians = {};
+
+        // Calculate medians
+        Object.keys(cleanedData[0]).forEach((key) => {
+          const values = cleanedData
+            .map((row) => parseFloat(row[key]))
+            .filter((value) => !isNaN(value));
+          const median = calculateMedian(values);
+          columnMedians[key] = median;
+        });
+
+        // Fill missing values with column median
+        cleanedData = cleanedData.map((row) => {
+          Object.keys(row).forEach((key) => {
+            if (row[key] === null || row[key] === "") {
+              row[key] = columnMedians[key];
+              handledCount++;
+            }
+          });
+          return row;
+        });
+        changesLog.push(
+          `Handled missing values (filled with median): ${handledCount}`
+        );
+      } else if (missingValuesMethodSelect.value === "fill-custom") {
+        const customValue = customValueInput.value;
+
+        // Fill missing values with custom value
+        cleanedData = cleanedData.map((row) => {
+          Object.keys(row).forEach((key) => {
+            if (row[key] === null || row[key] === "") {
+              row[key] = customValue;
+              handledCount++;
+            }
+          });
+          return row;
+        });
+        changesLog.push(
+          `Handled missing values (filled with custom value): ${handledCount}`
+        );
+      } else if (missingValuesMethodSelect.value === "forward-fill") {
+        // Forward fill missing values
+        cleanedData.forEach((row, rowIndex) => {
+          Object.keys(row).forEach((key) => {
+            if ((row[key] === null || row[key] === "") && rowIndex > 0) {
+              row[key] = cleanedData[rowIndex - 1][key];
+              handledCount++;
+            }
+          });
+        });
+        changesLog.push(
+          `Handled missing values (forward filled): ${handledCount}`
+        );
+      } else if (missingValuesMethodSelect.value === "backward-fill") {
+        // Backward fill missing values
+        for (let rowIndex = cleanedData.length - 1; rowIndex >= 0; rowIndex--) {
+          const row = cleanedData[rowIndex];
+          Object.keys(row).forEach((key) => {
+            if (
+              (row[key] === null || row[key] === "") &&
+              rowIndex < cleanedData.length - 1
+            ) {
+              row[key] = cleanedData[rowIndex + 1][key];
+              handledCount++;
+            }
+          });
+        }
+        changesLog.push(
+          `Handled missing values (backward filled): ${handledCount}`
+        );
       }
     }
 
@@ -210,6 +362,31 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
+    if (mergeDuplicateRowsCheckbox.checked) {
+      const mergedData = [];
+      const seenKeys = {};
+
+      cleanedData.forEach((row) => {
+        const key = JSON.stringify(row); // Assuming the whole row is the key for simplicity
+        if (seenKeys[key]) {
+          Object.keys(row).forEach((col) => {
+            if (!isNaN(row[col])) {
+              seenKeys[key][col] += parseFloat(row[col]);
+            }
+          });
+        } else {
+          seenKeys[key] = { ...row };
+        }
+      });
+
+      for (const key in seenKeys) {
+        mergedData.push(seenKeys[key]);
+      }
+
+      cleanedData = mergedData;
+      changesLog.push(`Merged duplicate rows`);
+    }
+
     displayCleanedData(cleanedData);
     logCleanedDataActions(changesLog);
   };
@@ -225,6 +402,15 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       return sorted[base];
     }
+  };
+
+  // Function to calculate median
+  const calculateMedian = (arr) => {
+    const sorted = arr.slice().sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 !== 0
+      ? sorted[mid]
+      : (sorted[mid - 1] + sorted[mid]) / 2;
   };
 
   // Function to display cleaned data

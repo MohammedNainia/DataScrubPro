@@ -25,57 +25,72 @@
       </p>
     </header>
     <main>
-      <div class="file-input">
-        <label for="fileInput" class="button">Upload File</label>
-        <input type="file" id="fileInput" hidden />
-        <button id="cleanData" class="button">Clean Data</button>
-        <button id="exportData" class="button">Export Data</button>
-        <button id="clearData" class="button">Clear</button>
-      </div>
       <div class="options-log-container">
-        <div id="cleaningOptions">
+        <div id="cleaningOptions" class="sticky-top">
+          <!-- Sticky behavior added -->
           <h2>Cleaning Options</h2>
-          <label
-            ><input type="checkbox" id="removeDuplicates" /> Remove
-            Duplicates</label
-          ><br />
-          <label
-            ><input type="checkbox" id="handleMissingValues" /> Handle Missing
-            Values</label
-          >
-          <select id="missingValuesMethod">
-            <option value="remove">Remove Rows</option>
-            <option value="fill">Fill with "N/A"</option></select
-          ><br />
-          <label
-            ><input type="checkbox" id="correctDateFormats" /> Correct Date
-            Formats</label
-          >
-          <input
-            type="text"
-            id="dateFormat"
-            placeholder="Date Format (e.g., YYYY-MM-DD)"
-          /><br />
-          <label
-            ><input type="checkbox" id="deleteOutliers" /> Delete
-            Outliers</label
-          ><br />
-          <label
-            ><input type="checkbox" id="convertDataTypes" /> Convert Data
-            Types</label
-          ><br />
-          <label
-            ><input type="checkbox" id="standardizeCapitalization" />
-            Standardize Capitalization</label
-          ><br />
-          <label
-            ><input type="checkbox" id="ensureStructuralConsistency" /> Ensure
-            Structural Consistency</label
-          >
-        </div>
-        <div class="log-container">
-          <h2>Data Cleaning Log</h2>
-          <div id="log"></div>
+          <div class="options-container">
+            <label
+              ><input type="checkbox" id="removeDuplicates" /> Remove
+              Duplicates</label
+            >
+            <label
+              ><input type="checkbox" id="handleMissingValues" /> Handle Missing
+              Values</label
+            >
+            <select id="missingValuesMethod">
+              <option value="remove">Remove Rows</option>
+              <option value="remove-columns">Remove Columns</option>
+              <option value="fill-custom">Fill with Custom Value</option>
+              <option value="fill-mean">Fill with Mean</option>
+              <option value="fill-mode">Fill with Mode</option>
+              <option value="fill-median">Fill with Median</option>
+              <option value="forward-fill">Forward Fill</option>
+              <option value="backward-fill">Backward Fill</option>
+            </select>
+            <input
+              type="text"
+              id="customValueInput"
+              placeholder="Enter custom value"
+              style="display: none"
+            />
+            <label
+              ><input type="checkbox" id="correctDateFormats" /> Correct Date
+              Formats</label
+            >
+            <input
+              type="text"
+              id="dateFormat"
+              placeholder="Date Format (e.g., YYYY-MM-DD)"
+            />
+            <label
+              ><input type="checkbox" id="deleteOutliers" /> Delete
+              Outliers</label
+            >
+            <label
+              ><input type="checkbox" id="convertDataTypes" /> Convert Data
+              Types</label
+            >
+            <label
+              ><input type="checkbox" id="standardizeCapitalization" />
+              Standardize Capitalization</label
+            >
+            <label
+              ><input type="checkbox" id="ensureStructuralConsistency" /> Ensure
+              Structural Consistency</label
+            >
+            <label
+              ><input type="checkbox" id="mergeDuplicateRows" /> Merge Duplicate
+              Rows</label
+            >
+          </div>
+          <div class="file-input">
+            <label for="fileInput" class="button">Upload File</label>
+            <input type="file" id="fileInput" hidden />
+            <button id="cleanData" class="button">Clean Data</button>
+            <button id="exportData" class="button">Export Data</button>
+            <button id="clearData" class="button">Clear</button>
+          </div>
         </div>
       </div>
       <div class="data-container">
@@ -88,6 +103,12 @@
           <div id="updatedDataTable" class="table-container"></div>
         </section>
       </div>
+      <footer>
+        <div class="log-container">
+          <h2>Data Cleaning Log</h2>
+          <div id="log"></div>
+        </div>
+      </footer>
     </main>
   </body>
 </html>
