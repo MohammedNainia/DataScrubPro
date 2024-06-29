@@ -38,7 +38,7 @@
               ><input type="checkbox" id="handleMissingValues" /> Handle Missing
               Values</label
             >
-            <select id="missingValuesMethod">
+            <select id="missingValuesMethod" style="display: none">
               <option value="remove">Remove Rows</option>
               <option value="remove-columns">Remove Columns</option>
               <option value="fill-custom">Fill with Custom Value</option>
@@ -54,15 +54,23 @@
               placeholder="Enter custom value"
               style="display: none"
             />
-            <label
-              ><input type="checkbox" id="correctDateFormats" /> Correct Date
-              Formats</label
-            >
-            <input
-              type="text"
-              id="dateFormat"
-              placeholder="Date Format (e.g., YYYY-MM-DD)"
-            />
+            <label>
+              <input type="checkbox" id="correctDateFormats" /> Correct Date
+              Formats
+            </label>
+            <select id="dateFormatSelect" style="display: none">
+              <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+              <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+              <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+              <option value="YYYY/MM/DD">YYYY/MM/DD</option>
+              <option value="DD-MM-YYYY">DD-MM-YYYY</option>
+              <option value="MM-DD-YYYY">MM-DD-YYYY</option>
+              <option value="YYYY.MM.DD">YYYY.MM.DD</option>
+              <option value="DD.MM.YYYY">DD.MM.YYYY</option>
+              <option value="MM.DD.YYYY">MM.DD.YYYY</option>
+              <!-- Add more date formats as needed -->
+            </select>
+
             <label
               ><input type="checkbox" id="deleteOutliers" /> Delete
               Outliers</label
@@ -83,6 +91,13 @@
               ><input type="checkbox" id="mergeDuplicateRows" /> Merge Duplicate
               Rows</label
             >
+            <label>
+              <input type="checkbox" id="removeUnwantedSpaces" /> Remove
+              Unwanted Spaces
+            </label>
+            <select id="targetColumnSelect" style="display: none">
+              <option value="">Select Column</option>
+            </select>
           </div>
           <div class="file-input">
             <label for="fileInput" class="button">Upload File</label>

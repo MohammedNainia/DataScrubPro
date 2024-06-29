@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Existing element references
   const fileInput = document.getElementById("fileInput");
   const cleanDataButton = document.getElementById("cleanData");
   const exportDataButton = document.getElementById("exportData");
@@ -13,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const customValueInput = document.getElementById("customValueInput");
   const correctDateFormatsCheckbox =
     document.getElementById("correctDateFormats");
-  const dateFormatInput = document.getElementById("dateFormat");
+  const dateFormatSelect = document.getElementById("dateFormatSelect");
   const deleteOutliersCheckbox = document.getElementById("deleteOutliers");
   const convertDataTypesCheckbox = document.getElementById("convertDataTypes");
   const standardizeCapitalizationCheckbox = document.getElementById(
@@ -25,10 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const mergeDuplicateRowsCheckbox =
     document.getElementById("mergeDuplicateRows");
 
+  // New element references
+  const removeUnwantedSpacesCheckbox = document.getElementById(
+    "removeUnwantedSpaces"
+  );
+  const targetColumnSelect = document.getElementById("targetColumnSelect");
+
   let originalData = [];
   let cleanedData = [];
 
-  // Show/hide custom value input based on selected method
   missingValuesMethodSelect.addEventListener("change", () => {
     if (missingValuesMethodSelect.value === "fill-custom") {
       customValueInput.style.display = "inline";
@@ -37,13 +43,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Function to read the file
+  removeUnwantedSpacesCheckbox.addEventListener("change", () => {
+    if (removeUnwantedSpacesCheckbox.checked) {
+      targetColumnSelect.style.display = "inline";
+    } else {
+      targetColumnSelect.style.display = "none";
+    }
+  });
+
+  handleMissingValuesCheckbox.addEventListener("change", () => {
+    if (handleMissingValuesCheckbox.checked) {
+      missingValuesMethodSelect.style.display = "inline";
+    } else {
+      missingValuesMethodSelect.style.display = "none";
+      customValueInput.style.display = "none";
+    }
+  });
+
+  correctDateFormatsCheckbox.addEventListener("change", () => {
+    if (correctDateFormatsCheckbox.checked) {
+      dateFormatSelect.style.display = "inline";
+    } else {
+      dateFormatSelect.style.display = "none";
+    }
+  });
+
   const readFile = (file) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const data = readFileContent(file.name, event.target.result);
       originalData = data;
       displayOriginalData(originalData);
+      populateColumnSelect(originalData);
     };
     if (file.name.endsWith(".csv")) {
       reader.readAsText(file);
@@ -66,13 +97,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Function to display original data
   const displayOriginalData = (data) => {
     const originalDataTable = document.getElementById("originalDataTable");
     originalDataTable.innerHTML = generateTableHTML(data);
   };
 
-  // Function to generate table HTML
   const generateTableHTML = (data) => {
     const headers = Object.keys(data[0]);
     let tableHTML = "<table><thead><tr>";
@@ -91,7 +120,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return tableHTML;
   };
 
-  // Function to clean data
+  const populateColumnSelect = (data) => {
+    const headers = Object.keys(data[0]);
+    targetColumnSelect.innerHTML = '<option value="">Select Column</option>';
+    headers.forEach((header) => {
+      targetColumnSelect.innerHTML += `<option value="${header}">${header}</option>`;
+    });
+  };
+
   const cleanData = () => {
     let changesLog = [];
     cleanedData = _.cloneDeep(originalData);
@@ -103,6 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
       changesLog.push(`Removed duplicates: ${duplicatesRemoved}`);
     }
 
+    // Handle Missing Values
     if (handleMissingValuesCheckbox.checked) {
       let handledCount = 0;
       if (missingValuesMethodSelect.value === "remove-rows") {
@@ -121,7 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const columnsToRemove = [];
         const rowCount = cleanedData.length;
 
-        // Identify columns to remove
         Object.keys(cleanedData[0]).forEach((key) => {
           let emptyCount = 0;
           cleanedData.forEach((row) => {
@@ -134,7 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
 
-        // Remove identified columns
         cleanedData = cleanedData.map((row) => {
           columnsToRemove.forEach((col) => delete row[col]);
           return row;
@@ -146,7 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (missingValuesMethodSelect.value === "fill-mean") {
         const columnMeans = {};
 
-        // Calculate means
         Object.keys(cleanedData[0]).forEach((key) => {
           const values = cleanedData
             .map((row) => parseFloat(row[key]))
@@ -156,7 +190,6 @@ document.addEventListener("DOMContentLoaded", () => {
           columnMeans[key] = mean;
         });
 
-        // Fill missing values with column mean
         cleanedData = cleanedData.map((row) => {
           Object.keys(row).forEach((key) => {
             if (row[key] === null || row[key] === "") {
@@ -172,7 +205,6 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (missingValuesMethodSelect.value === "fill-mode") {
         const columnModes = {};
 
-        // Calculate modes
         Object.keys(cleanedData[0]).forEach((key) => {
           const values = cleanedData
             .map((row) => row[key])
@@ -186,7 +218,6 @@ document.addEventListener("DOMContentLoaded", () => {
           columnModes[key] = mode;
         });
 
-        // Fill missing values with column mode
         cleanedData = cleanedData.map((row) => {
           Object.keys(row).forEach((key) => {
             if (row[key] === null || row[key] === "") {
@@ -202,7 +233,6 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (missingValuesMethodSelect.value === "fill-median") {
         const columnMedians = {};
 
-        // Calculate medians
         Object.keys(cleanedData[0]).forEach((key) => {
           const values = cleanedData
             .map((row) => parseFloat(row[key]))
@@ -211,7 +241,6 @@ document.addEventListener("DOMContentLoaded", () => {
           columnMedians[key] = median;
         });
 
-        // Fill missing values with column median
         cleanedData = cleanedData.map((row) => {
           Object.keys(row).forEach((key) => {
             if (row[key] === null || row[key] === "") {
@@ -227,7 +256,6 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (missingValuesMethodSelect.value === "fill-custom") {
         const customValue = customValueInput.value;
 
-        // Fill missing values with custom value
         cleanedData = cleanedData.map((row) => {
           Object.keys(row).forEach((key) => {
             if (row[key] === null || row[key] === "") {
@@ -241,7 +269,6 @@ document.addEventListener("DOMContentLoaded", () => {
           `Handled missing values (filled with custom value): ${handledCount}`
         );
       } else if (missingValuesMethodSelect.value === "forward-fill") {
-        // Forward fill missing values
         cleanedData.forEach((row, rowIndex) => {
           Object.keys(row).forEach((key) => {
             if ((row[key] === null || row[key] === "") && rowIndex > 0) {
@@ -254,7 +281,6 @@ document.addEventListener("DOMContentLoaded", () => {
           `Handled missing values (forward filled): ${handledCount}`
         );
       } else if (missingValuesMethodSelect.value === "backward-fill") {
-        // Backward fill missing values
         for (let rowIndex = cleanedData.length - 1; rowIndex >= 0; rowIndex--) {
           const row = cleanedData[rowIndex];
           Object.keys(row).forEach((key) => {
@@ -275,13 +301,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (correctDateFormatsCheckbox.checked) {
       let correctedCount = 0;
-      const dateFormat = dateFormatInput.value;
+      const dateFormat = dateFormatSelect.value;
       cleanedData = cleanedData.map((row) => {
         Object.keys(row).forEach((key) => {
           if (Date.parse(row[key])) {
-            row[key] = new Date(row[key])
-              .toISOString()
-              .slice(0, dateFormat.length);
+            row[key] = moment(row[key]).format(dateFormat);
             correctedCount++;
           }
         });
@@ -367,7 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const seenKeys = {};
 
       cleanedData.forEach((row) => {
-        const key = JSON.stringify(row); // Assuming the whole row is the key for simplicity
+        const key = JSON.stringify(row);
         if (seenKeys[key]) {
           Object.keys(row).forEach((col) => {
             if (!isNaN(row[col])) {
@@ -387,11 +411,29 @@ document.addEventListener("DOMContentLoaded", () => {
       changesLog.push(`Merged duplicate rows`);
     }
 
+    if (removeUnwantedSpacesCheckbox.checked) {
+      const targetColumn = targetColumnSelect.value;
+      let spacesRemovedCount = 0;
+
+      cleanedData = cleanedData.map((row) => {
+        if (row[targetColumn]) {
+          const originalValue = row[targetColumn];
+          row[targetColumn] = row[targetColumn].replace(/\s+/g, " ").trim();
+          const spacesRemoved = originalValue.length - row[targetColumn].length;
+          spacesRemovedCount += spacesRemoved > 0 ? 1 : 0;
+        }
+        return row;
+      });
+
+      changesLog.push(
+        `Removed unwanted spaces from column: ${targetColumn} (Total cells cleaned: ${spacesRemovedCount})`
+      );
+    }
+
     displayCleanedData(cleanedData);
     logCleanedDataActions(changesLog);
   };
 
-  // Function to calculate quantile
   const quantile = (arr, q) => {
     const sorted = arr.sort((a, b) => a - b);
     const pos = (sorted.length - 1) * q;
@@ -404,7 +446,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Function to calculate median
   const calculateMedian = (arr) => {
     const sorted = arr.slice().sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
@@ -413,13 +454,11 @@ document.addEventListener("DOMContentLoaded", () => {
       : (sorted[mid - 1] + sorted[mid]) / 2;
   };
 
-  // Function to display cleaned data
   const displayCleanedData = (data) => {
     const updatedDataTable = document.getElementById("updatedDataTable");
     updatedDataTable.innerHTML = generateTableHTML(data);
   };
 
-  // Function to log cleaned data actions
   const logCleanedDataActions = (changesLog) => {
     const logContainer = document.getElementById("log");
     logContainer.innerHTML = "<h3>Data Cleaning Actions:</h3>";
@@ -428,7 +467,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // Function to export cleaned data
   const exportData = () => {
     const csv = Papa.unparse(cleanedData);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -440,7 +478,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.removeChild(link);
   };
 
-  // Function to clear data
   const clearData = () => {
     originalData = [];
     cleanedData = [];
@@ -450,7 +487,6 @@ document.addEventListener("DOMContentLoaded", () => {
     fileInput.value = "";
   };
 
-  // Event listeners
   fileInput.addEventListener("change", (event) => {
     readFile(event.target.files[0]);
   });
